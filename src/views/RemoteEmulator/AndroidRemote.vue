@@ -907,6 +907,15 @@ const websocketOnmessage = (message) => {
       ElMessage.warning({
         message: $t('androidRemoteTS.deviceDisconnected'),
       });
+      resetStatus();
+      break;
+    }
+    case 'deviceReconnected': {
+      // 取消之前的重连定时器（如果有）
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
       // 先清理旧连接和状态
       cleanupConnection();
       // 设置10秒后重连
@@ -1658,6 +1667,17 @@ const getWebViewForward = () => {
     })
   );
 };
+
+function resetStatus() {
+  // 重置操作状态, 以便重连后重新初始化
+  isDriverFinish.value = false;
+  isShowImg.value = false;
+  loading.value = true;
+  isShowTree.value = false;
+  isFixTouch = false;
+  oldBlob = undefined;
+}
+
 const cleanupConnection = () => {
   if (websocket !== null) {
     websocket.close();
@@ -1676,13 +1696,7 @@ const cleanupConnection = () => {
   if (audioPlayer !== null) {
     destroyAudio();
   }
-  // 重置操作状态, 以便重连后重新初始化
-  isDriverFinish.value = false;
-  isShowImg.value = false;
-  loading.value = true;
-  isShowTree.value = false;
-  isFixTouch = false;
-  oldBlob = undefined;
+  resetStatus();
 };
 const close = () => {
   cleanupConnection();
