@@ -870,6 +870,8 @@ const androidRemoteTS = {
       here: '這裡',
     },
   },
+  deviceDisconnected: '設備已斷開連接！',
+  attemptReconnect: '正在嘗試重連...',
 };
 const indexIOSTS = {
   contentText: '切換佈局',

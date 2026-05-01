@@ -123,6 +123,7 @@ let moveY = 0;
 let isFixTouch = false;
 let isPress = false;
 let loop = null;
+let reconnectTimer = null;
 let time = 0;
 let isLongPress = false;
 let mouseMoveTime = 0;
@@ -897,6 +898,34 @@ const websocketOnmessage = (message) => {
       router.go(-1);
       break;
     }
+    case 'deviceDisconnected': {
+      // 取消之前的重连定时器（如果有）
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+      ElMessage.warning({
+        message: $t('androidRemoteTS.deviceDisconnected'),
+      });
+      // 先清理旧连接和状态
+      cleanupConnection();
+      // 设置10秒后重连
+      reconnectTimer = setTimeout(() => {
+        reconnectTimer = null;
+        if (device.value && device.value.udId && agent.value && agent.value.host && agent.value.port && agent.value.secretKey) {
+          ElMessage.info({
+            message: $t('androidRemoteTS.attemptReconnect'),
+          });
+          openSocket(
+            agent.value.host,
+            agent.value.port,
+            agent.value.secretKey,
+            device.value.udId
+          );
+        }
+      }, 10000);
+      break;
+    }
   }
 };
 const inputValue = ref('');
@@ -1629,7 +1658,7 @@ const getWebViewForward = () => {
     })
   );
 };
-const close = () => {
+const cleanupConnection = () => {
   if (websocket !== null) {
     websocket.close();
     websocket = null;
@@ -1647,9 +1676,23 @@ const close = () => {
   if (audioPlayer !== null) {
     destroyAudio();
   }
+  // 重置操作状态, 以便重连后重新初始化
+  isDriverFinish.value = false;
+  isShowImg.value = false;
+  loading.value = true;
+  isShowTree.value = false;
+  isFixTouch = false;
+  oldBlob = undefined;
+};
+const close = () => {
+  cleanupConnection();
   window.close();
 };
 onBeforeUnmount(() => {
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
   close();
 });
 const getDeviceById = (id) => {

@@ -953,6 +953,8 @@ const androidRemoteTS = {
       here: 'here',
     },
   },
+  deviceDisconnected: 'Device has been disconnected!',
+  attemptReconnect: 'Attempting to reconnect...',
 };
 const indexIOSTS = {
   contentText: 'Switching layout',

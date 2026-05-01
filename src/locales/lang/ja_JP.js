@@ -872,6 +872,8 @@ const androidRemoteTS = {
       here: '这里',
     },
   },
+  deviceDisconnected: 'デバイスが切断されました！',
+  attemptReconnect: '再接続を試みています...',
 };
 const indexIOSTS = {
   contentText: '切换布局',

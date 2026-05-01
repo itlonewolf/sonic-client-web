@@ -931,6 +931,8 @@ const androidRemoteTS = {
       here: '这里',
     },
   },
+  deviceDisconnected: '设备已断开连接！',
+  attemptReconnect: '正在尝试重连...',
 };
 const indexIOSTS = {
   contentText: '切换布局',
